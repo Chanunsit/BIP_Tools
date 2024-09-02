@@ -10,7 +10,7 @@ from bpy.types import Scene
 from bpy.types import Header
 
 
-
+\
 class VIEW3D_PT_BIP_MainPanel(Panel):
     bl_idname = "VIEW3D_PT_BIP_Main_panel"
     bl_label = " Tools"

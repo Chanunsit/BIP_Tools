@@ -77,8 +77,10 @@ class BIP_OT_DupCutter(Operator):
             selected_object = bpy.context.active_object
             while selected_object.constraints:
                 selected_object.constraints.remove(selected_object.constraints[0])
-            
-            
+            bpy.ops.object.constraint_add(type='COPY_TRANSFORMS')
+            bpy.context.object.constraints["Copy Transforms"].target = bpy.data.objects[cutter_name]
+            utils.select_object_by_name(cutter_name)
+
         return {'FINISHED'}
 
     
