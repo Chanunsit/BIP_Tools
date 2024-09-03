@@ -1,5 +1,34 @@
 import bpy
 import os
+import textwrap
+
+# ตัดบรรทัดบน Panel
+def text_wrap(context, text, parent, line_height, char_width:int = 7):
+    texts = text.split("$/n")
+    for text in texts:
+        chars = int(context.region.width / char_width)   # 7 pix on 1 character
+        wrapper = textwrap.TextWrapper(width=chars)
+        text_lines = wrapper.wrap(text=text)
+        if "$/h" in text_lines[0]:
+            text_lines[0] = text_lines[0].replace("$/h","")
+            for i in range(len(text_lines)):
+                text_lines[i] = "$/h" + text_lines[i]
+        if "$/s" in text_lines[0]:
+            text_lines[0] = text_lines[0].replace("$/s","")
+            for i in range(len(text_lines)):
+                text_lines[i] = "$/s" + text_lines[i]
+        for i, text_line in enumerate(text_lines):
+            row = parent.row(align=True)
+            if i == 0:
+                row.label(text="", icon="INFO")
+            if "$/h" in text_line:
+                row.alert = True
+                text_line = text_line.replace("$/h","")
+            if "$/s" in text_line:
+                row.enabled = False
+                text_line = text_line.replace("$/s","") 
+            row.label(text=text_line)
+            row.scale_y = line_height
 
 # เลือก OBJ ผ่านชื่อ
 def select_object_by_name(name):

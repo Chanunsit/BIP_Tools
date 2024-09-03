@@ -13,6 +13,9 @@ class MyProperties(PropertyGroup):
                  ('setting', "Setting", "Addon Setting", "PREFERENCES", 2)
                  ]
     )
+    
+    # ตัวแปร Info บน Panel
+    info_text : StringProperty(name="Info", default="First! Import Assets to this Scene")
 
 
 

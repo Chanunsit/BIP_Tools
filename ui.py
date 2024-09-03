@@ -2,6 +2,7 @@ import bpy
 
 
 from . import icon_reg
+from . import utils
 
 
 from bpy.types import Panel
@@ -47,8 +48,12 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             box = layout.box()
             row = box.row()
             row.label(text="Building")
+            utils.text_wrap(context, bip_tools.info_text, box, 0.5, 7)
+            row = box.row()
             row = box.row()
             row.operator("bip_tools.import_assets_operator", icon="IMPORT")
+            row = box.row()
+            row.operator("bip_tools.add_boolean_operator", icon="MOD_BOOLEAN")
             row = box.row()
             row.operator("bip_tools.dup_cutter_operator", icon="UV_ISLANDSEL")
 
