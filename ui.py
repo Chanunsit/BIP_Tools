@@ -11,7 +11,7 @@ from bpy.types import Scene
 from bpy.types import Header
 
 
-\
+
 class VIEW3D_PT_BIP_MainPanel(Panel):
     bl_idname = "VIEW3D_PT_BIP_Main_panel"
     bl_label = " Tools"
@@ -61,7 +61,7 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row.alignment = "CENTER"
             row.scale_x = 5
             row.operator("bip_tools.del_cutter_operator", text="", icon="TRASH")
-            row.operator("bip_tools.replace_cutter_operator", text="", icon="MOD_LENGTH")
+            row.operator("bip_tools.replace_cutter_operator", text="", icon="EYEDROPPER")
             row = box.row()
             row.label(text="Show and Hide :")
             row = box.row()

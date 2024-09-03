@@ -64,6 +64,11 @@ class BIP_OT_AddBoolean(Operator):
     def execute(self, context):
         scene = context.scene
         bip_tools = scene.bip_tools
+
+        # ห้ามเลือกเกิน 2 0bj
+        if len(context.selected_objects) > 1:
+            self.report({"INFO"} ,"Please select only 1 object")
+            return {'FINISHED'}
         
         # สร้าง BIP_Brick_Cutters Collection
         main_collection_name = "BIP_BuildingDestruction"
@@ -248,18 +253,51 @@ class BIP_OT_ReplaceCutter(Operator):
     @classmethod
     def poll(cls, context):
         if "BIP_BuildingDestruction" in bpy.data.collections:
-            # ตรวจสอบว่ามีวัตถุที่ถูกเลือกอย่างน้อย 2 ชิ้น
-            if len(context.selected_objects) < 2:
-                return False
             # ตรวจสอบว่า Active Object มีอยู่และไม่มีชื่อ "_Cutter."
+            if len(context.selected_objects) <= 1:
+                return False
             active_obj = context.active_object
-            if active_obj and "_Cutter." not in active_obj.name:
+            if "_Cutter" in active_obj.name:
                 return True
-            
         return False
 
     def execute(self, context):
-        print("Swarppppppppppppppppppppp")
+        selected_object_names = [obj.name for obj in bpy.context.selected_objects]
+        active_object_name = context.active_object.name
+        
+        for i, name in enumerate(selected_object_names):
+            bpy.ops.object.select_all(action='DESELECT')
+            if "BIP_Brick_" in name:
+                print(name)
+                utils.select_object_by_name(name)
+                obj = context.active_object
+                if not obj.name == active_object_name:
+                    if obj.type == "MESH":
+                        # เก็บตำแหน่งและการหมุนของ Object ที่เลือก
+                        loc = obj.location.copy()
+                        roc = obj.rotation_euler.copy()
+
+                        # ลบ Object เดิม
+                        print(f"Old Object : {name}")
+                        utils.select_object_by_name(name)
+                        bpy.ops.bip_tools.del_cutter_operator()
+                        bpy.ops.object.select_all(action='DESELECT')
+
+                        # คัดลอก Object ต้นแบบและวางที่ตำแหน่งเดิม
+                        print(f"active_object_name : {active_object_name} : to {loc}, {roc}")
+                        utils.select_object_by_name(active_object_name)
+                        bpy.ops.bip_tools.dup_cutter_operator()
+
+                        # บังคับให้เลือกวัตถุใหม่หลังการคัดลอก
+                        new_object = context.active_object
+                        new_object.select_set(True)
+                        bpy.context.view_layer.objects.active = new_object
+
+                        # กำหนดตำแหน่งและการหมุน
+                        new_object.location = loc
+                        new_object.rotation_euler = roc
+                        bpy.ops.object.select_all(action='DESELECT')
+            print("---------------------------------------")
         return {'FINISHED'}
 
 #คำสั่ง Show/Hide Collection
