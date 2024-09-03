@@ -44,10 +44,10 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
         if bip_tools.tabs_menu == "destools":
             layout = self.layout
             row = layout.row()
-            row.label(text="Destruction Tools:")
+            row.label(text="Destruction Tools :")
             box = layout.box()
             row = box.row()
-            row.label(text="Building")
+            row.label(text="Building :")
             utils.text_wrap(context, bip_tools.info_text, box, 0.5, 7)
             row = box.row()
             row = box.row()
@@ -55,7 +55,19 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row = box.row()
             row.operator("bip_tools.add_boolean_operator", icon="MOD_BOOLEAN")
             row = box.row()
+            row.scale_y = 2
             row.operator("bip_tools.dup_cutter_operator", icon="UV_ISLANDSEL")
+            row = box.row(align=True)
+            row.alignment = "CENTER"
+            row.scale_x = 5
+            row.operator("bip_tools.del_cutter_operator", text="", icon="TRASH")
+            row.operator("bip_tools.replace_cutter_operator", text="", icon="MOD_LENGTH")
+            row = box.row()
+            row.label(text="Show and Hide :")
+            row = box.row()
+            row.operator("bip_tools.show_brick_operator", text="Main").action = "BIP_BuildingDestruction"
+            row.operator("bip_tools.show_brick_operator", text="Cutters").action = "BIP_Brick_Cutters"
+            row.operator("bip_tools.show_brick_operator", text="Bricks").action = "BIP_Bricks"
 
 classes = [VIEW3D_PT_BIP_MainPanel]
 

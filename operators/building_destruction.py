@@ -27,8 +27,8 @@ class BIP_OT_ImportAssets(Operator):
         utils.append_collection("resources", "bip_building_dst.blend", "BIP_BuildingDestruction")
         utils.select_object_by_name("BIP_BuildingDestruction_Locator")
         bpy.ops.wm.tool_set_by_id(name="builtin.move")
-        collection = bpy.data.collections.get("BIP_Bricks_Assets")
-        collection.hide_select = True
+        # collection = bpy.data.collections.get("BIP_Bricks_Assets")
+        # collection.hide_select = True
         bip_tools.info_text = "Select your Building and click Add Boolean"
         #utils.collection_collapse_all_by_name("BIP_BuildingDestruction")
 
@@ -62,6 +62,9 @@ class BIP_OT_AddBoolean(Operator):
         return False
 
     def execute(self, context):
+        scene = context.scene
+        bip_tools = scene.bip_tools
+        
         # สร้าง BIP_Brick_Cutters Collection
         main_collection_name = "BIP_BuildingDestruction"
         main_parent_collection = bpy.data.collections.get(main_collection_name)
@@ -85,6 +88,8 @@ class BIP_OT_AddBoolean(Operator):
                 # ย้าย BIP_Brick Collection ไปที่ BIP_BuildingDestruction
                 main_parent_collection.children.link(new_brick_collection)
                 print(f"Collection '{brick_collection_name}' created inside '{main_collection_name}'.")
+        collection = bpy.data.collections.get("BIP_Bricks")
+        collection.hide_select = True
                 
         # Add Boolean
         bpy.ops.object.modifier_add(type='BOOLEAN')
@@ -93,6 +98,8 @@ class BIP_OT_AddBoolean(Operator):
         bpy.context.object.modifiers["BIP_Brick_Cutters"].collection = bpy.data.collections["BIP_Brick_Cutters"]
         bpy.context.object.modifiers["BIP_Brick_Cutters"].use_hole_tolerant = True
         bpy.context.object.modifiers["BIP_Brick_Cutters"].material_mode = 'TRANSFER'
+        
+        bip_tools.info_text = "Select a Cutter and click Duplicate and move it to your building"
 
         return {'FINISHED'}
     
@@ -107,7 +114,7 @@ class BIP_OT_DupCutter(Operator):
     bl_options = {"REGISTER", "UNDO"}
     bl_description = "Duplicate Cutter with constraints and move to Boolean collection"
 
-    action : StringProperty(name="action")
+    
 
     @classmethod
     def poll(cls, context):
@@ -143,6 +150,8 @@ class BIP_OT_DupCutter(Operator):
                 # ย้าย BIP_Brick Collection ไปที่ BIP_BuildingDestruction
                 main_parent_collection.children.link(new_brick_collection)
                 print(f"Collection '{brick_collection_name}' created inside '{main_collection_name}'.")
+                collection = bpy.data.collections.get("BIP_Bricks")
+                collection.hide_select = True
             
             # คำสั่ง Duplicate และย้ายไปที่ Collection
             bpy.ops.object.duplicate_move()
@@ -175,6 +184,7 @@ class BIP_OT_DupCutter(Operator):
                 selected_object.constraints.remove(selected_object.constraints[0])
             bpy.ops.object.constraint_add(type='COPY_TRANSFORMS')
             bpy.context.object.constraints["Copy Transforms"].target = bpy.data.objects[cutter_name]
+            bpy.ops.object.select_all(action='DESELECT')
             utils.select_object_by_name(cutter_name)
             bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
             
@@ -194,16 +204,106 @@ class BIP_OT_DupCutter(Operator):
 
         return {'FINISHED'}
 
+#คำสั่งลบ Cutter
+class BIP_OT_DelCutter(Operator):
+    bl_idname = "bip_tools.del_cutter_operator"
+    bl_label = "Delete Cutter"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Delete Selected Cutters"
+
+    @classmethod
+    def poll(cls, context):
+        # ตรวจสอบว่ามีวัตถุที่ถูกเลือกและ active object ไม่เป็น None
+        if context.selected_objects and context.active_object:
+            # ตรวจสอบว่าชื่อของ active object มี "_Cutter." อยู่หรือไม่
+            return "_Cutter." in context.active_object.name and "BIP_BuildingDestruction" in bpy.data.collections
+        return False
+
+    def execute(self, context):
+        collection = bpy.data.collections.get("BIP_Bricks")
+        collection.hide_select = False
+        selected_object_names = [obj.name for obj in bpy.context.selected_objects]
+        for name in selected_object_names:
+            utils.select_object_by_name(name.replace("_Cutter", ""))
+            utils.select_object_by_name(name)
+            bpy.ops.object.delete()
+        collection.hide_select = True
+        # ลบ Mesh Data ที่ไม่ได้ใช้งานออกจากหน่วยความจำ
+        bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
+        return {'FINISHED'}
+    
+#คำสั่งสลับ Cutter
+class BIP_OT_ReplaceCutter(Operator):
+    bl_idname = "bip_tools.replace_cutter_operator"
+    bl_label = "Replace Cutter"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Replace Cutters From Active"
+
+    @classmethod
+    def poll(cls, context):
+        if "BIP_BuildingDestruction" in bpy.data.collections:
+            # ตรวจสอบว่ามีวัตถุที่ถูกเลือกอย่างน้อย 2 ชิ้น
+            if len(context.selected_objects) < 2:
+                return False
+            # ตรวจสอบว่า Active Object มีอยู่และไม่มีชื่อ "_Cutter."
+            active_obj = context.active_object
+            if active_obj and "_Cutter." not in active_obj.name:
+                return True
+            
+        return False
+
+    def execute(self, context):
+        print("Swarppppppppppppppppppppp")
+        return {'FINISHED'}
+
+#คำสั่ง Show/Hide Collection
+class BIP_OT_ShowBrick(Operator):
+    bl_idname = "bip_tools.show_brick_operator"
+    bl_label = "Show and Hide Brick"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Show and Hide Brick"
+
+    action : StringProperty(name="action")
+
+    @classmethod
+    def poll(cls, context):
+        # ตรวจสอบว่ามีคอลเลคชันชื่อ "BIP_BuildingDestruction"
+        if "BIP_BuildingDestruction" in bpy.data.collections:
+                return True
+        return False
+
+    def execute(self, context):
+        action = self.action
+        collection = bpy.data.collections.get(action)
+        collection.hide_viewport = not collection.hide_viewport
+            
+        return {'FINISHED'}
+
     
 def register():
     bpy.utils.register_class(BIP_OT_ImportAssets)
     bpy.utils.register_class(BIP_OT_AddBoolean)
     bpy.utils.register_class(BIP_OT_DupCutter)
+    bpy.utils.register_class(BIP_OT_ShowBrick)
+    bpy.utils.register_class(BIP_OT_DelCutter)
+    bpy.utils.register_class(BIP_OT_ReplaceCutter)
 
            
 def unregister():
     bpy.utils.unregister_class(BIP_OT_ImportAssets)
     bpy.utils.unregister_class(BIP_OT_AddBoolean)
     bpy.utils.unregister_class(BIP_OT_DupCutter)
+    bpy.utils.unregister_class(BIP_OT_ShowBrick)
+    bpy.utils.unregister_class(BIP_OT_DelCutter)
+    bpy.utils.unregister_class(BIP_OT_ReplaceCutter)
 
         

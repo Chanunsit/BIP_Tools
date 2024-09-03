@@ -43,7 +43,8 @@ def select_object_by_name(name):
 # Append Collection ผ่านไฟล์ในโฟลเดอร์
 def append_collection(path:str, filename:str, collection:str):
     # กำหนด path ของไฟล์ .blend
-    blend_file_path = os.path.join(path, filename)
+    resources_path = os.path.join(os.path.dirname(__file__), path)
+    blend_file_path = os.path.join(resources_path, filename)
 
     # กำหนดชื่อของคอลเลคชันที่ต้องการ Append
     collection_name = collection
