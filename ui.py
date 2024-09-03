@@ -48,6 +48,8 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row = box.row()
             row.label(text="Building")
             row = box.row()
+            row.operator("bip_tools.import_assets_operator", icon="IMPORT")
+            row = box.row()
             row.operator("bip_tools.dup_cutter_operator", icon="UV_ISLANDSEL")
 
 classes = [VIEW3D_PT_BIP_MainPanel]
