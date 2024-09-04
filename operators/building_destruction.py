@@ -461,6 +461,11 @@ class BIP_OT_LODTools(Operator):
             new_mesh_data = bpy.data.meshes.get(data_name+str(bip_tools.lod_num))
             print(obj.data.name)
             obj.data = new_mesh_data
+        
+        # สำสั่งเลือก Object
+        bpy.ops.object.select_all(action='DESELECT')
+        for name in bricks_name:
+            utils.select_object_by_name(name.replace(".", "_Cutter."))
         return {'FINISHED'}
 
     
