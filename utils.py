@@ -41,7 +41,7 @@ def select_object_by_name(name):
         return False
     
 # Append Collection ผ่านไฟล์ในโฟลเดอร์
-def append_collection(path:str, filename:str, collection:str):
+def append_collection(path: str, filename: str, collection: str):
     # กำหนด path ของไฟล์ .blend
     resources_path = os.path.join(os.path.dirname(__file__), path)
     blend_file_path = os.path.join(resources_path, filename)
@@ -54,13 +54,44 @@ def append_collection(path:str, filename:str, collection:str):
     print(collection_path)
 
     # Append คอลเลคชันจากไฟล์ .blend
+    with bpy.data.libraries.load(blend_file_path, link=False) as (data_from, data_to):
+        if collection_name in data_from.collections:
+            data_to.collections.append(collection_name)
+    
+    # นำคอลเลคชันที่ Append ไปใส่ใน Scene Collection
+    appended_collection = bpy.data.collections.get(collection_name)
+    if appended_collection:
+        bpy.context.scene.collection.children.link(appended_collection)
+        print(f"Appended collection '{collection_name}' to the Scene Collection.")
+    else:
+        print(f"Failed to append collection '{collection_name}' from '{blend_file_path}'.")
+
+# Append Node ผ่านไฟล์ในโฟลเดอร์
+def append_geometry_node(path: str, filename: str, node_group_name: str):
+    # ตรวจสอบว่า Geometry Node Group มีอยู่แล้วหรือไม่
+    if node_group_name in bpy.data.node_groups:
+        print(f"'{node_group_name}' already exists in the current file. Skipping append.")
+        return
+    
+    # กำหนด path ของไฟล์ .blend
+    resources_path = os.path.join(os.path.dirname(__file__), path)
+    blend_file_path = os.path.join(resources_path, filename)
+
+    # กำหนดชื่อของ Geometry Node Group ที่ต้องการ Append
+    geometry_node_name = node_group_name
+
+    # เตรียม path ไปยัง Geometry Node Group ในไฟล์ .blend
+    node_group_path = os.path.join(blend_file_path, "NodeTree", geometry_node_name)
+    print(node_group_path)
+
+    # Append Geometry Node Group จากไฟล์ .blend
     bpy.ops.wm.append(
-        filepath=collection_path, 
-        directory=os.path.join(blend_file_path, "Collection"), 
-        filename=collection_name
+        filepath=node_group_path, 
+        directory=os.path.join(blend_file_path, "NodeTree"), 
+        filename=geometry_node_name
     )
 
-    print(f"Appended collection '{collection_name}' from '{blend_file_path}'.")
+    print(f"Appended Geometry Node Group '{geometry_node_name}' from '{blend_file_path}'.")
 
 
 # Focus outliner
@@ -90,3 +121,5 @@ def collection_collapse_all_by_name(name: str):
                             bpy.ops.outliner.show_one_level(open=False)
                         except Exception as e:
                             print(f"Error collapsing Outliner: {e}")
+                            
+                            

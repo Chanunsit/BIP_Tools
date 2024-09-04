@@ -63,11 +63,19 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row.operator("bip_tools.del_cutter_operator", text="", icon="TRASH")
             row.operator("bip_tools.replace_cutter_operator", text="", icon="EYEDROPPER")
             row = box.row()
-            row.label(text="Show and Hide :")
+            col = box.column()
+            col.label(text="Show and Hide :")
+            row = col.row()
+            row.operator("bip_tools.show_brick_operator", text="All").action = "collection:>BIP_BuildingDestruction"
+            row.operator("bip_tools.show_brick_operator", text="Cutters").action = "collection:>BIP_Brick_Cutters"
+            row.operator("bip_tools.show_brick_operator", text="Bricks").action = "collection:>BIP_Bricks"
             row = box.row()
-            row.operator("bip_tools.show_brick_operator", text="Main").action = "BIP_BuildingDestruction"
-            row.operator("bip_tools.show_brick_operator", text="Cutters").action = "BIP_Brick_Cutters"
-            row.operator("bip_tools.show_brick_operator", text="Bricks").action = "BIP_Bricks"
+            col = box.column()
+            col.label(text="Entity :")
+            row = col.row(align=True)
+            row.prop(bip_tools, "lod_num", text="")
+            row.operator("bip_tools.lod_tools_operator", text="LOD")
+            col.operator("bip_tools.create_entity_operator", text="Create Entity To Collection")
 
 classes = [VIEW3D_PT_BIP_MainPanel]
 

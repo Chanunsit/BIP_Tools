@@ -17,6 +17,8 @@ class MyProperties(PropertyGroup):
     # ตัวแปร Info บน Panel
     info_text : StringProperty(name="Info", default="First! Import Assets to this Scene")
 
+    #ตัวแปร LOD
+    lod_num : IntProperty(name="LOD", default=0, min=0, max=3)
 
 
 classes = [MyProperties]

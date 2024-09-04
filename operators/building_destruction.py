@@ -31,6 +31,17 @@ class BIP_OT_ImportAssets(Operator):
         # collection.hide_select = True
         bip_tools.info_text = "Select your Building and click Add Boolean"
         #utils.collection_collapse_all_by_name("BIP_BuildingDestruction")
+        
+        # ตรวจสอบว่าคอลเลคชัน "BIP_Bricks_Assets_LOD" มีอยู่ใน bpy.data.collections หรือไม่
+        collection_name = "BIP_Bricks_Assets_LOD"
+        collection = bpy.data.collections.get(collection_name)
+
+        if collection:
+            # ลบคอลเลคชันทั้งหมด รวมถึงวัตถุในคอลเลคชันและคอลเลคชันย่อย
+            bpy.data.collections.remove(collection)
+            print(f"Collection '{collection_name}' and its hierarchy have been deleted.")
+        else:
+            print(f"Collection '{collection_name}' not found.")
 
         return {'FINISHED'}
     
@@ -132,6 +143,17 @@ class BIP_OT_DupCutter(Operator):
     def execute(self, context):
         scene = context.scene
         
+        # ห้ามเลือกเกิน 1 0bj
+        if len(context.selected_objects) > 1:
+            self.report({"INFO"} ,"Please select only 1 object, Multiple select work in progress")
+            return {'FINISHED'}
+        
+        #Show Collection
+        collection = bpy.data.collections.get("BIP_Brick_Cutters")
+        collection.hide_viewport = False
+        collection = bpy.data.collections.get("BIP_Bricks")
+        collection.hide_viewport = False
+        
         # สร้าง BIP_Brick_Cutters Collection
         main_collection_name = "BIP_BuildingDestruction"
         main_parent_collection = bpy.data.collections.get(main_collection_name)
@@ -174,7 +196,7 @@ class BIP_OT_DupCutter(Operator):
             print(brick_name)
             bpy.ops.object.select_all(action='DESELECT')
             utils.select_object_by_name(brick_name)
-            bpy.ops.object.duplicate_move()
+            bpy.ops.object.duplicate_move_linked()
             selected_objects = bpy.context.selected_objects
             for obj in selected_objects:
             # Unlink the object from its current collection(s)
@@ -321,9 +343,109 @@ class BIP_OT_ShowBrick(Operator):
 
     def execute(self, context):
         action = self.action
-        collection = bpy.data.collections.get(action)
-        collection.hide_viewport = not collection.hide_viewport
+        command = action.split(":>")[0]
+        name = action.split(":>")[1]
+        if command == "collection":
+            try:
+                collection = bpy.data.collections.get(name)
+                collection.hide_viewport = not collection.hide_viewport
+            except:
+                print("Not Found Collection")
+        elif command == "entity":
+            print("Ennnnnnnnnnnnnnnn")
             
+        return {'FINISHED'}
+    
+#คำสั่งสร้าง Entity
+class BIP_OT_CreateEntity(Operator):
+    bl_idname = "bip_tools.create_entity_operator"
+    bl_label = "Create Entity"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Create Entity To Active Collection"
+
+    action : StringProperty(name="action")
+
+    @classmethod
+    def poll(cls, context):
+        # ตรวจสอบว่ามีคอลเลคชันชื่อ "BIP_Bricks"
+        if "BIP_Bricks" in bpy.data.collections:
+                return True
+        return False
+
+    def execute(self, context):
+        scene = context.scene
+        bip_tools = scene.bip_tools
+        
+        utils.append_geometry_node("resources", "bip_node_lib.blend", "BIP_Collection_Join")
+        bpy.ops.mesh.primitive_cube_add(size=2)
+        bpy.context.object.name = "BIP_Entity_Brick_LOD"+str(bip_tools.lod_num)
+        bpy.context.object.data.uv_layers["UVMap"].name = "UVMap0"
+        # เพิ่ม Geometry Nodes modifier ให้กับวัตถุที่เลือก
+        bpy.ops.object.modifier_add(type='NODES')
+
+        # กำหนดชื่อของ Node Group ที่จะใช้
+        node_group_name = "BIP_Collection_Join"
+        collection_name = "BIP_Bricks"
+
+        # ตรวจสอบว่ามี Node Group ที่ต้องการใน bpy.data.node_groups หรือไม่
+        if node_group_name in bpy.data.node_groups:
+            # Assign Node Group ให้กับ modifier
+            modifier = bpy.context.object.modifiers[-1]
+            modifier.node_group = bpy.data.node_groups[node_group_name]
+
+            # เชื่อมต่อคอลเลคชันกับ input socket ของ Node Group
+            if collection_name in bpy.data.collections:
+                modifier["Socket_2"] = bpy.data.collections[collection_name]
+            else:
+                print(f"Collection '{collection_name}' not found.")
+        else:
+            print(f"Node Group '{node_group_name}' not found.")
+        
+        bpy.ops.object.modifier_apply(modifier="GeometryNodes")
+    
+        return {'FINISHED'}
+    
+#คำสั่งเกี่ยวกับ LOD
+class BIP_OT_LODTools(Operator):
+    bl_idname = "bip_tools.lod_tools_operator"
+    bl_label = "LOD Tools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Edit LOD For Bricks"
+
+    action : StringProperty(name="action")
+
+    @classmethod
+    def poll(cls, context):
+        # ตรวจสอบว่ามีวัตถุที่ถูกเลือกและ active object ไม่เป็น None
+        if context.selected_objects and context.active_object:
+            # ตรวจสอบว่าชื่อของ active object มี "BIP_Brick_" อยู่หรือไม่
+            return "BIP_Brick_" in context.active_object.name and "BIP_BuildingDestruction" in bpy.data.collections
+        return False
+
+    def execute(self, context):
+        scene = context.scene
+        bip_tools = scene.bip_tools
+        
+        selected_objects = context.selected_objects
+        bricks_name = []
+        for obj in selected_objects:
+            bricks_name.append(obj.name.replace("_Cutter", ""))
+        print(bricks_name)
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        for name in bricks_name:
+            utils.select_object_by_name(name)
+            obj = context.active_object
+            data_name = obj.data.name
+            data_name = data_name[:-1]
+            new_mesh_data = bpy.data.meshes.get(data_name+str(bip_tools.lod_num))
+            obj.data = new_mesh_data
         return {'FINISHED'}
 
     
@@ -334,6 +456,8 @@ def register():
     bpy.utils.register_class(BIP_OT_ShowBrick)
     bpy.utils.register_class(BIP_OT_DelCutter)
     bpy.utils.register_class(BIP_OT_ReplaceCutter)
+    bpy.utils.register_class(BIP_OT_CreateEntity)
+    bpy.utils.register_class(BIP_OT_LODTools)
 
            
 def unregister():
@@ -343,5 +467,7 @@ def unregister():
     bpy.utils.unregister_class(BIP_OT_ShowBrick)
     bpy.utils.unregister_class(BIP_OT_DelCutter)
     bpy.utils.unregister_class(BIP_OT_ReplaceCutter)
+    bpy.utils.unregister_class(BIP_OT_CreateEntity)
+    bpy.utils.unregister_class(BIP_OT_LODTools)
 
         
