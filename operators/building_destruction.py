@@ -24,6 +24,11 @@ class BIP_OT_ImportAssets(Operator):
     def execute(self, context):
         scene = context.scene
         bip_tools = scene.bip_tools
+        bpy.context.space_data.shading.wireframe_color_type = 'OBJECT'
+        bpy.context.space_data.shading.color_type = 'OBJECT'
+        bpy.ops.object.select_all(action='DESELECT')
+        
+
         utils.append_collection("resources", "bip_building_dst.blend", "BIP_BuildingDestruction")
         utils.select_object_by_name("BIP_BuildingDestruction_Locator")
         bpy.ops.wm.tool_set_by_id(name="builtin.move")
@@ -43,6 +48,13 @@ class BIP_OT_ImportAssets(Operator):
         else:
             print(f"Collection '{collection_name}' not found.")
 
+        # คำสั่ง Fake-User Mesh ทั้งหมด
+        meshes = bpy.data.meshes
+        for mesh in meshes:
+            if "BIP_Brick" in mesh.name:
+                print(mesh.name)
+                mesh.use_fake_user = True
+        
         return {'FINISHED'}
     
     
@@ -149,10 +161,11 @@ class BIP_OT_DupCutter(Operator):
             return {'FINISHED'}
         
         #Show Collection
-        collection = bpy.data.collections.get("BIP_Brick_Cutters")
-        collection.hide_viewport = False
-        collection = bpy.data.collections.get("BIP_Bricks")
-        collection.hide_viewport = False
+        if "BIP_Brick_Cutters" in bpy.data.collections and "BIP_Bricks" in bpy.data.collections:
+            collection = bpy.data.collections.get("BIP_Brick_Cutters")
+            collection.hide_viewport = False
+            collection = bpy.data.collections.get("BIP_Bricks")
+            collection.hide_viewport = False
         
         # สร้าง BIP_Brick_Cutters Collection
         main_collection_name = "BIP_BuildingDestruction"
@@ -259,7 +272,7 @@ class BIP_OT_DelCutter(Operator):
             bpy.ops.object.delete()
         collection.hide_select = True
         # ลบ Mesh Data ที่ไม่ได้ใช้งานออกจากหน่วยความจำ
-        bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
+        bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=False, do_recursive=False)
         return {'FINISHED'}
     
 #คำสั่งสลับ Cutter
@@ -423,7 +436,7 @@ class BIP_OT_LODTools(Operator):
     @classmethod
     def poll(cls, context):
         # ตรวจสอบว่ามีวัตถุที่ถูกเลือกและ active object ไม่เป็น None
-        if context.selected_objects and context.active_object:
+        if context.selected_objects:
             # ตรวจสอบว่าชื่อของ active object มี "BIP_Brick_" อยู่หรือไม่
             return "BIP_Brick_" in context.active_object.name and "BIP_BuildingDestruction" in bpy.data.collections
         return False
@@ -444,7 +457,9 @@ class BIP_OT_LODTools(Operator):
             obj = context.active_object
             data_name = obj.data.name
             data_name = data_name[:-1]
+            print("Replace Data : " + data_name+str(bip_tools.lod_num))
             new_mesh_data = bpy.data.meshes.get(data_name+str(bip_tools.lod_num))
+            print(obj.data.name)
             obj.data = new_mesh_data
         return {'FINISHED'}
 
