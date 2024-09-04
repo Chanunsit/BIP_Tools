@@ -52,8 +52,9 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row = box.row()
             row = box.row()
             row.operator("bip_tools.import_assets_operator", icon="IMPORT")
-            row = box.row()
+            row = box.row(align=True)
             row.operator("bip_tools.add_boolean_operator", icon="MOD_BOOLEAN")
+            row.operator("bip_tools.del_boolean_operator", text="", icon="TRASH")
             row = box.row()
             row.scale_y = 2
             row.operator("bip_tools.dup_cutter_operator", icon="UV_ISLANDSEL")

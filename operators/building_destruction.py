@@ -131,6 +131,35 @@ class BIP_OT_AddBoolean(Operator):
 
         return {'FINISHED'}
     
+#คำสั่งลบ Boolean
+class BIP_OT_DelBoolean(Operator):
+    bl_idname = "bip_tools.del_boolean_operator"
+    bl_label = "Delete Boolean"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Delete Boolean In Object"
+
+    @classmethod
+    def poll(cls, context):
+        # ตรวจสอบว่ามีคอลเลคชันชื่อ "BIP_BuildingDestruction" และมี active object
+        if "BIP_BuildingDestruction" in bpy.data.collections and context.selected_objects:
+            if not "BIP_Brick_" in context.active_object.name:
+                # ตรวจสอบว่า active object เป็นวัตถุชนิด Mesh และมีการเลือกวัตถุ Mesh
+                if context.active_object.type == 'MESH':
+                    # ตรวจสอบว่ามี Boolean แล้วหรือยัง
+                    for modifier in context.active_object.modifiers:
+                        if modifier.name == "BIP_Brick_Cutters":
+                            return True
+                    # # ตรวจสอบว่ามีวัตถุ Mesh ที่ถูกเลือก
+                    # if any(obj.type == 'MESH' for obj in context.selected_objects):
+                    #     return True
+        return False
+
+    def execute(self, context):
+        bpy.ops.object.modifier_remove(modifier="BIP_Brick_Cutters")
+        return {'FINISHED'}
     
 #คำสั่ง Duplicate Cutter
 class BIP_OT_DupCutter(Operator):
@@ -478,6 +507,7 @@ def register():
     bpy.utils.register_class(BIP_OT_ReplaceCutter)
     bpy.utils.register_class(BIP_OT_CreateEntity)
     bpy.utils.register_class(BIP_OT_LODTools)
+    bpy.utils.register_class(BIP_OT_DelBoolean)
 
            
 def unregister():
@@ -489,5 +519,6 @@ def unregister():
     bpy.utils.unregister_class(BIP_OT_ReplaceCutter)
     bpy.utils.unregister_class(BIP_OT_CreateEntity)
     bpy.utils.unregister_class(BIP_OT_LODTools)
+    bpy.utils.unregister_class(BIP_OT_DelBoolean)
 
         
