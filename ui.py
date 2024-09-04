@@ -47,7 +47,13 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row.label(text="Destruction Tools :")
             box = layout.box()
             row = box.row()
+            row.alignment = "LEFT"
             row.label(text="Building :")
+            row.label(text="", icon_value=icon_reg.iconLib("wall_dst_01"))
+            row.label(text="", icon_value=icon_reg.iconLib("wall_dst_02"))
+            row.label(text="", icon_value=icon_reg.iconLib("wall_dst_03"))
+            row.label(text="", icon_value=icon_reg.iconLib("wall_dst_04"))
+            row.label(text="", icon_value=icon_reg.iconLib("wall_dst_05"))
             utils.text_wrap(context, bip_tools.info_text, box, 0.5, 7)
             row = box.row()
             row = box.row()
