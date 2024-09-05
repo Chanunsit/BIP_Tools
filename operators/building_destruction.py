@@ -163,8 +163,10 @@ class BIP_OT_AddBoolean(Operator):
         bpy.context.object.modifiers["Boolean"].name = "BIP_Brick_Cutters"
         bpy.context.object.modifiers["BIP_Brick_Cutters"].operand_type = 'COLLECTION'
         bpy.context.object.modifiers["BIP_Brick_Cutters"].collection = bpy.data.collections["BIP_Brick_Cutters"]
+        bpy.context.object.modifiers["BIP_Brick_Cutters"].solver = 'FAST'
         bpy.context.object.modifiers["BIP_Brick_Cutters"].use_hole_tolerant = True
         bpy.context.object.modifiers["BIP_Brick_Cutters"].material_mode = 'TRANSFER'
+        
         
         bip_tools.info_text = "Select a Cutter and click Duplicate and move it to your building"
 
@@ -199,6 +201,7 @@ class BIP_OT_DelBoolean(Operator):
     def execute(self, context):
         bpy.ops.object.modifier_remove(modifier="BIP_Brick_Cutters")
         return {'FINISHED'}
+    
     
 #คำสั่ง Duplicate Cutter
 class BIP_OT_DupCutter(Operator):

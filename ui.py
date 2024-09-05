@@ -59,9 +59,30 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row = box.row(align=True)
             row.operator("bip_tools.import_assets_operator", icon="IMPORT")
             row.operator("bip_tools.del_assets_operator", text="", icon="TRASH")
-            row = box.row(align=True)
+            col = box.column()
+            row = col.row(align=True)
             row.operator("bip_tools.add_boolean_operator", icon="MOD_BOOLEAN")
             row.operator("bip_tools.del_boolean_operator", text="", icon="TRASH")
+            #row = box.row(align=True)
+            #row.alignment = "CENTER"
+            row = col.row(align=True)
+            obj = context.active_object
+        
+            # วนลูปผ่าน modifiers เพื่อหา "BIP_Brick_Cutters"
+            if not obj:
+                layout.label(text="No object selected")
+                return
+
+            # ค้นหา modifier ที่ชื่อ "BIP_Brick_Cutters"
+            modifier = next((mod for mod in obj.modifiers if mod.name == "BIP_Brick_Cutters"), None)
+            if modifier:
+                # ตรวจสอบว่า modifier มี property "solver" หรือไม่
+                if hasattr(modifier, "solver"):
+                    # แสดง property "solver" บน Panel โดยใช้ปุ่มแบบขยายได้
+                    row.prop(modifier, "solver", text="Solver", expand=True)
+                else:
+                    row.label(text="No Solver property found.")
+
             row = box.row()
             row.scale_y = 2
             row.operator("bip_tools.dup_cutter_operator", icon="UV_ISLANDSEL")
@@ -84,6 +105,17 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             row.prop(bip_tools, "lod_num", text="")
             row.operator("bip_tools.lod_tools_operator", text="LOD")
             col.operator("bip_tools.create_entity_operator", text="Create Entity To Collection")
+            row = box.row(align=True)
+            row.scale_y = 0.5
+            row.alignment = "LEFT"
+            row.active = False
+            row.label(text="", icon="INFO")
+            row.label(text="Select LOD and click create Entity")
+            row = box.row()
+            row.scale_y = 0.5
+            row.active = False
+            row.label(text="When you have finished the design")
+            row = box.row()
 
 classes = [VIEW3D_PT_BIP_MainPanel]
 

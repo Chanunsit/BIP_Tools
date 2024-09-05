@@ -6,6 +6,8 @@ from bpy.props import (EnumProperty, PointerProperty, StringProperty, FloatVecto
 
 
 
+    
+    
 class MyProperties(PropertyGroup):
     tabs_menu : EnumProperty(
         name = "Tabs",
@@ -19,6 +21,7 @@ class MyProperties(PropertyGroup):
 
     #ตัวแปร LOD
     lod_num : IntProperty(name="LOD", default=0, min=0, max=3)
+    
 
 
 classes = [MyProperties]
