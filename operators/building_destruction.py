@@ -73,6 +73,8 @@ class BIP_OT_DelAssets(Operator):
         return "BIP_BuildingDestruction" in bpy.data.collections
 
     def execute(self, context):
+        scene = context.scene
+        bip_tools = scene.bip_tools
         
         # ตรวจสอบว่าคอลเลคชัน "BIP_BuildingDestruction" มีอยู่ใน bpy.data.collections หรือไม่
         collection_name = "BIP_BuildingDestruction"
@@ -94,6 +96,7 @@ class BIP_OT_DelAssets(Operator):
         
         # ลบ Mesh Data ที่ไม่ได้ใช้งานออกจากหน่วยความจำ
         bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
+        bip_tools.info_text = "First! Import Assets to this Scene"
         return {'FINISHED'}
     
     
