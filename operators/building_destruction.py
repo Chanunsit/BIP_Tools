@@ -57,6 +57,45 @@ class BIP_OT_ImportAssets(Operator):
         
         return {'FINISHED'}
     
+#คำสั่งลบ Assets
+class BIP_OT_DelAssets(Operator):
+    bl_idname = "bip_tools.del_assets_operator"
+    bl_label = "Delete Assets"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_icon = "IMPORT"
+    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Delete Assets In Scene"
+
+    @classmethod
+    def poll(cls, context):
+        # ตรวจสอบว่ามีคอลเลคชันชื่อ "BIP_BuildingDestruction"
+        return "BIP_BuildingDestruction" in bpy.data.collections
+
+    def execute(self, context):
+        
+        # ตรวจสอบว่าคอลเลคชัน "BIP_BuildingDestruction" มีอยู่ใน bpy.data.collections หรือไม่
+        collection_name = "BIP_BuildingDestruction"
+        collection = bpy.data.collections.get(collection_name)
+
+        if collection:
+            # ลบคอลเลคชันทั้งหมด รวมถึงวัตถุในคอลเลคชันและคอลเลคชันย่อย
+            bpy.data.collections.remove(collection)
+            print(f"Collection '{collection_name}' and its hierarchy have been deleted.")
+        else:
+            print(f"Collection '{collection_name}' not found.")
+        
+        # คำสั่ง Fake-User Mesh ทั้งหมด
+        meshes = bpy.data.meshes
+        for mesh in meshes:
+            if "BIP_Brick" in mesh.name:
+                print(mesh.name)
+                mesh.use_fake_user = False
+        
+        # ลบ Mesh Data ที่ไม่ได้ใช้งานออกจากหน่วยความจำ
+        bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
+        return {'FINISHED'}
+    
     
 #คำสั่ง Add Boolean
 class BIP_OT_AddBoolean(Operator):
@@ -130,7 +169,7 @@ class BIP_OT_AddBoolean(Operator):
         bip_tools.info_text = "Select a Cutter and click Duplicate and move it to your building"
 
         return {'FINISHED'}
-    
+
 #คำสั่งลบ Boolean
 class BIP_OT_DelBoolean(Operator):
     bl_idname = "bip_tools.del_boolean_operator"
@@ -508,6 +547,7 @@ def register():
     bpy.utils.register_class(BIP_OT_CreateEntity)
     bpy.utils.register_class(BIP_OT_LODTools)
     bpy.utils.register_class(BIP_OT_DelBoolean)
+    bpy.utils.register_class(BIP_OT_DelAssets)
 
            
 def unregister():
@@ -520,5 +560,6 @@ def unregister():
     bpy.utils.unregister_class(BIP_OT_CreateEntity)
     bpy.utils.unregister_class(BIP_OT_LODTools)
     bpy.utils.unregister_class(BIP_OT_DelBoolean)
+    bpy.utils.unregister_class(BIP_OT_DelAssets)
 
         
