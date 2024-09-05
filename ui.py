@@ -71,7 +71,7 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
         
             # วนลูปผ่าน modifiers เพื่อหา "BIP_Brick_Cutters"
             if not obj:
-                layout.label(text="No object selected")
+                row.label(text="No object selected")
                 return
 
             # ค้นหา modifier ที่ชื่อ "BIP_Brick_Cutters"
