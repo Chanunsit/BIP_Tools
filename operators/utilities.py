@@ -1,5 +1,8 @@
 import bpy
 import bmesh
+
+from .. import utils
+
 from bpy.types import (Operator)
 from bpy.props import (EnumProperty, PointerProperty, StringProperty, FloatVectorProperty, FloatProperty, IntProperty, BoolProperty)
 
@@ -8,7 +11,7 @@ from bpy.props import (EnumProperty, PointerProperty, StringProperty, FloatVecto
 class BIP_OT_ToggleProp(Operator):
     bl_idname = "bip_tools.toggle_prop_operator"
     bl_label = "Toggle"
-    bl_description = "Show/Hide"
+    bl_description = "Something"
 
     prop_name: bpy.props.StringProperty(name="Property Name") 
 
@@ -18,6 +21,8 @@ class BIP_OT_ToggleProp(Operator):
         current_value = getattr(bip_tools, self.prop_name)
         setattr(bip_tools, self.prop_name, not current_value)
         print(f"{self.prop_name}: {getattr(bip_tools, self.prop_name)}")
+        self.report({"INFO"} ,"Duplicate")
+        
                
         return {'FINISHED'}
     

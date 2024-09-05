@@ -436,11 +436,12 @@ class BIP_OT_ShowBrick(Operator):
         command = action.split(":>")[0]
         name = action.split(":>")[1]
         if command == "collection":
-            try:
-                collection = bpy.data.collections.get(name)
-                collection.hide_viewport = not collection.hide_viewport
-            except:
-                print("Not Found Collection")
+            utils.hide_viewport_collection(name, True)
+            # try:
+            #     collection = bpy.data.collections.get(name)
+            #     collection.hide_viewport = not collection.hide_viewport
+            # except:
+            #     print("Not Found Collection")
         elif command == "entity":
             print("Ennnnnnnnnnnnnnnn")
             

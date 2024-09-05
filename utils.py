@@ -110,16 +110,53 @@ def focus_object_in_outliner():
                 except:
                     pass
                 
-def collection_collapse_all_by_name(name: str):
-    for area in bpy.context.screen.areas:
-        if area.type == 'OUTLINER':
-            for region in area.regions:
-                if region.type == 'WINDOW':
-                    # ลองใช้ temp_override เพื่อจัดการบริบท
-                    with bpy.context.temp_override(area=area, region=region, space_data=area.spaces.active):
-                        try:
-                            bpy.ops.outliner.show_one_level(open=False)
-                        except Exception as e:
-                            print(f"Error collapsing Outliner: {e}")
+def hide_viewport_collection(collection_name:str, toggle:bool = False):
+    # ค้นหา LayerCollection ใน View Layer ปัจจุบัน
+    layer_collections = bpy.context.view_layer.layer_collection
+
+    # ฟังก์ชันค้นหา LayerCollection ตามชื่อ
+    def find_layer_collection(layer_collection, name):
+        if layer_collection.name == name:
+            return layer_collection
+        for child in layer_collection.children:
+            found = find_layer_collection(child, name)
+            if found:
+                return found
+        return None
+
+    # ค้นหาคอลเลคชันที่ต้องการ
+    target_layer_collection = find_layer_collection(layer_collections, collection_name)
+
+    if target_layer_collection:
+        # พับคอลเลคชัน
+        if toggle:
+            target_layer_collection.hide_viewport = not target_layer_collection.hide_viewport
+        else:
+            target_layer_collection.hide_viewport = True
+        print(f"Collapsed collection '{collection_name}'")
+    else:
+        print(f"Collection '{collection_name}' not found")
                             
-                            
+def collapse_collection(collection_name:str):
+    # ค้นหา LayerCollection ใน View Layer ปัจจุบัน
+    layer_collections = bpy.context.view_layer.layer_collection
+
+    # ฟังก์ชันค้นหา LayerCollection ตามชื่อ
+    def find_layer_collection(layer_collection, name):
+        if layer_collection.name == name:
+            return layer_collection
+        for child in layer_collection.children:
+            found = find_layer_collection(child, name)
+            if found:
+                return found
+        return None
+
+    # ค้นหาคอลเลคชันที่ต้องการ
+    target_layer_collection = find_layer_collection(layer_collections, collection_name)
+
+    if target_layer_collection:
+        # พับคอลเลคชัน
+        bpy.ops.outliner.expanded.toggle()
+        print(f"Collapsed collection '{collection_name}'")
+    else:
+        print(f"Collection '{collection_name}' not found")
