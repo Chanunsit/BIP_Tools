@@ -84,9 +84,13 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
                 else:
                     row.label(text="No Solver property found.")
 
-            row = box.row()
+            row = box.row(align=True)
             row.scale_y = 2
             row.operator("bip_tools.dup_cutter_operator", icon="UV_ISLANDSEL")
+            if bip_tools.dup_to_cursor:
+                row.operator("bip_tools.toggle_prop_operator", text="", icon="PIVOT_CURSOR").prop_name = "dup_to_cursor"
+            else:
+                row.operator("bip_tools.toggle_prop_operator", text="", icon="CURSOR").prop_name = "dup_to_cursor"
             row = box.row(align=True)
             row.alignment = "CENTER"
             row.scale_x = 5

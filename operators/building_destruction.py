@@ -228,6 +228,7 @@ class BIP_OT_DupCutter(Operator):
     
     def execute(self, context):
         scene = context.scene
+        bip_tools = scene.bip_tools
         
         # ห้ามเลือกเกิน 1 0bj
         if len(context.selected_objects) > 1:
@@ -314,7 +315,9 @@ class BIP_OT_DupCutter(Operator):
 
             
             bpy.ops.wm.tool_set_by_id(name="builtin.move")
-
+            
+            if bip_tools.dup_to_cursor:
+                bpy.ops.view3d.snap_selected_to_cursor(use_offset=True)
 
         return {'FINISHED'}
 

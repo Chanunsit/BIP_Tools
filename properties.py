@@ -22,6 +22,9 @@ class MyProperties(PropertyGroup):
     #ตัวแปร LOD
     lod_num : IntProperty(name="LOD", default=0, min=0, max=3)
     
+    #ตัวแปร Duplicate Cutter
+    dup_to_cursor : BoolProperty(name="Duplicate to Cursor", default=False)
+    
 
 
 classes = [MyProperties]
