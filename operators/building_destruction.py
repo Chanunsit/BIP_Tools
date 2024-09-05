@@ -469,6 +469,23 @@ class BIP_OT_CreateEntity(Operator):
     def execute(self, context):
         scene = context.scene
         bip_tools = scene.bip_tools
+
+        # Apply
+        selected_objects = bpy.context.selected_objects
+        for obj in selected_objects:
+            if obj.type == "MESH":
+                for mod in obj.modifiers:
+                    if mod.name == "BIP_Brick_Cutters":
+                        # ตรวจสอบว่ามี Solver property
+                        if hasattr(mod, "solver"):
+                            mod.solver = 'EXACT'
+                            print(f"Changed solver to Exact for object: {obj.name}")
+                        # Apply modifier หลังจากแก้ไขค่า solver
+                        bpy.context.view_layer.objects.active = obj  # ตั้งค่า object ที่จะ Apply เป็น Active
+                        bpy.ops.object.modifier_apply(modifier=mod.name)  # Apply modifier
+                        print(f"Applied modifier {mod.name} for object: {obj.name}")
+                        break
+
         
         utils.append_geometry_node("resources", "bip_node_lib.blend", "BIP_Collection_Join")
         bpy.ops.mesh.primitive_cube_add(size=2)
@@ -496,7 +513,9 @@ class BIP_OT_CreateEntity(Operator):
             print(f"Node Group '{node_group_name}' not found.")
         
         bpy.ops.object.modifier_apply(modifier="GeometryNodes")
-    
+
+        
+            
         return {'FINISHED'}
     
 #คำสั่งเกี่ยวกับ LOD
