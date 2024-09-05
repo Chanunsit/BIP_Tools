@@ -318,6 +318,8 @@ class BIP_OT_DupCutter(Operator):
             
             if bip_tools.dup_to_cursor:
                 bpy.ops.view3d.snap_selected_to_cursor(use_offset=True)
+            else:
+                bpy.ops.transform.translate('INVOKE_DEFAULT')
 
         return {'FINISHED'}
 
@@ -564,7 +566,7 @@ class BIP_OT_LODTools(Operator):
         for name in bricks_name:
             utils.select_object_by_name(name.replace(".", "_Cutter."))
         return {'FINISHED'}
-
+    
     
 def register():
     bpy.utils.register_class(BIP_OT_ImportAssets)
@@ -591,4 +593,4 @@ def unregister():
     bpy.utils.unregister_class(BIP_OT_DelBoolean)
     bpy.utils.unregister_class(BIP_OT_DelAssets)
 
-        
+

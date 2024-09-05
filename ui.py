@@ -18,7 +18,7 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
     bl_label = " Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "✦ ✖ ✦"
+    bl_category = "❘❙❚✖❚❙❘"
     #bl_width = 1000
 
     def draw_header(self, context):
@@ -41,6 +41,7 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
         row.alignment = "CENTER"
         row.prop(bip_tools, "tabs_menu", text="", expand=True) # Tabs, no expand
         row.scale_x = 2
+        
         #Mesh Tab
         if bip_tools.tabs_menu == "destools":
             layout = self.layout
