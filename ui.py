@@ -1,4 +1,5 @@
 import bpy
+import os
 
 
 from . import icon_reg
@@ -17,7 +18,7 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
     bl_label = " Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "∩"
+    bl_category = "✦ ✖ ✦"
     #bl_width = 1000
 
     def draw_header(self, context):
@@ -48,7 +49,7 @@ class VIEW3D_PT_BIP_MainPanel(Panel):
             box = layout.box()
             row = box.row()
             row.alignment = "LEFT"
-            row.label(text="Building :")
+            row.label(text="Wall :")
             row.label(text="", icon_value=icon_reg.iconLib("wall_dst_01"))
             row.label(text="", icon_value=icon_reg.iconLib("wall_dst_02"))
             row.label(text="", icon_value=icon_reg.iconLib("wall_dst_03"))
