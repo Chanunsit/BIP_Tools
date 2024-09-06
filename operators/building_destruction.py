@@ -318,8 +318,8 @@ class BIP_OT_DupCutter(Operator):
             
             if bip_tools.dup_to_cursor:
                 bpy.ops.view3d.snap_selected_to_cursor(use_offset=True)
-            else:
-                bpy.ops.transform.translate('INVOKE_DEFAULT')
+            # else:
+            #     bpy.ops.transform.translate('INVOKE_DEFAULT')
 
         return {'FINISHED'}
 
