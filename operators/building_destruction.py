@@ -241,6 +241,9 @@ class BIP_OT_DupCutter(Operator):
             collection.hide_viewport = False
             collection = bpy.data.collections.get("BIP_Bricks")
             collection.hide_viewport = False
+            
+        BIP_Bricks_Assets_collection = bpy.data.collections.get("BIP_Bricks_Assets")
+        BIP_Bricks_Assets_collection.hide_select = False
         
         # สร้าง BIP_Brick_Cutters Collection
         main_collection_name = "BIP_BuildingDestruction"
@@ -318,8 +321,11 @@ class BIP_OT_DupCutter(Operator):
             
             if bip_tools.dup_to_cursor:
                 bpy.ops.view3d.snap_selected_to_cursor(use_offset=True)
+                bpy.ops.view3d.view_center_cursor()
             # else:
             #     bpy.ops.transform.translate('INVOKE_DEFAULT')
+            
+            BIP_Bricks_Assets_collection.hide_select = True
 
         return {'FINISHED'}
 
@@ -390,6 +396,7 @@ class BIP_OT_ReplaceCutter(Operator):
                         # เก็บตำแหน่งและการหมุนของ Object ที่เลือก
                         loc = obj.location.copy()
                         roc = obj.rotation_euler.copy()
+                        scl = obj.scale.copy()
 
                         # ลบ Object เดิม
                         print(f"Old Object : {name}")
@@ -410,6 +417,7 @@ class BIP_OT_ReplaceCutter(Operator):
                         # กำหนดตำแหน่งและการหมุน
                         new_object.location = loc
                         new_object.rotation_euler = roc
+                        new_object.scale = scl
                         bpy.ops.object.select_all(action='DESELECT')
             print("---------------------------------------")
         return {'FINISHED'}
@@ -471,6 +479,9 @@ class BIP_OT_CreateEntity(Operator):
     def execute(self, context):
         scene = context.scene
         bip_tools = scene.bip_tools
+        
+        bpy.ops.view3d.snap_cursor_to_center()
+
 
         # Apply
         selected_objects = bpy.context.selected_objects
