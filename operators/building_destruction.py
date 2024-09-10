@@ -55,6 +55,18 @@ class BIP_OT_ImportAssets(Operator):
                 print(mesh.name)
                 mesh.use_fake_user = True
         
+        # คำสั่งลบ .001 ออกจาก Materials       
+        mat_list = bpy.data.materials
+        for o in bpy.data.objects:
+            for s in o.material_slots:
+                if s.material.name.startswith("BIP_"):  # ตรวจสอบว่าเป็น material ที่มี "BIP_" ในชื่อ
+                    if s.material.name[-3:].isnumeric():
+                        # ถ้า 3 ตัวสุดท้ายเป็นตัวเลข
+                        if s.material.name[:-4] in mat_list:
+                            # ถ้ามี material ที่ไม่มีตัวเลขต่อท้าย ก็ใช้ material นั้นแทน
+                            s.material = mat_list[s.material.name[:-4]]
+
+        
         return {'FINISHED'}
     
 #คำสั่งลบ Assets
