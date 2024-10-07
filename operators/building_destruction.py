@@ -228,7 +228,7 @@ class BIP_OT_DupCutter(Operator):
     bl_options = {"REGISTER", "UNDO"}
     bl_description = "Duplicate Cutter with constraints and move to Boolean collection"
 
-    
+    to_cursor = False
 
     @classmethod
     def poll(cls, context):
@@ -237,6 +237,13 @@ class BIP_OT_DupCutter(Operator):
             # ตรวจสอบว่าชื่อของ active object มี "BIP_Brick_" อยู่หรือไม่
             return "BIP_Brick_" in context.active_object.name and "BIP_BuildingDestruction" in bpy.data.collections
         return False
+    
+    def invoke(self, context, event):
+        if event.shift:
+            self.to_cursor = True
+            return self.execute(context)
+        else:
+            return self.execute(context)
     
     def execute(self, context):
         scene = context.scene
@@ -331,7 +338,7 @@ class BIP_OT_DupCutter(Operator):
             
             bpy.ops.wm.tool_set_by_id(name="builtin.move")
             
-            if bip_tools.dup_to_cursor:
+            if bip_tools.dup_to_cursor or self.to_cursor:
                 bpy.ops.view3d.snap_selected_to_cursor(use_offset=True)
                 bpy.ops.view3d.view_center_cursor()
             # else:
